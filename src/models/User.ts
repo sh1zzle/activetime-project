@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Connection } from 'mongoose';
 
 export interface IUser extends Document {
   name: string;
@@ -6,6 +6,20 @@ export interface IUser extends Document {
   password: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Create a specific connection to the activetime database
+let activeTimeDb: Connection;
+
+if (mongoose.connection.readyState === 0) {
+  activeTimeDb = mongoose.connection.useDb('activetime');
+} else {
+  // If mongoose is already connected, check if it's to the right database
+  if (mongoose.connection.db?.databaseName !== 'activetime') {
+    activeTimeDb = mongoose.connection.useDb('activetime');
+  } else {
+    activeTimeDb = mongoose.connection;
+  }
 }
 
 const UserSchema: Schema = new Schema(
@@ -26,8 +40,12 @@ const UserSchema: Schema = new Schema(
   },
   {
     timestamps: true,
+    collection: 'users',
   }
 );
 
-export default mongoose.models.User ||
-  mongoose.model<IUser>('User', UserSchema);
+// Use existing model or create new
+const UserModel =
+  mongoose.models.User || activeTimeDb.model<IUser>('User', UserSchema);
+
+export default UserModel;

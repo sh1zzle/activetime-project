@@ -1,15 +1,17 @@
+'use client';
+
 import './globals.css';
-import AuthProvider from '@/components/providers/SessionProvider';
+import { SessionProvider } from 'next-auth/react';
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang='en'>
-      <body className='antialiased'>
-        <AuthProvider>{children}</AuthProvider>
+      <body>
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

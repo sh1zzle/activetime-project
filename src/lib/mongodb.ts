@@ -2,6 +2,13 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
+// Force the URI to use the activetime database
+// This handles all URI formats including mongodb+srv://
+const MONGODB_URI_WITH_DB = MONGODB_URI.replace(
+  /(mongodb(?:\+srv)?:\/\/[^/]+)(?:\/[^?]*)?(\?.*)?$/,
+  '$1/activetime$2'
+);
+
 if (!MONGODB_URI) {
   throw new Error(
     'Please define the MONGODB_URI environment variable inside .env'
@@ -32,11 +39,14 @@ export async function connectToDatabase() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      dbName: 'activetime', // Force database name
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI_WITH_DB, opts)
+      .then((mongoose) => {
+        return mongoose;
+      });
   }
 
   try {
