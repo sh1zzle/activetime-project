@@ -1,42 +1,46 @@
 'use client';
-import { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useMutation } from '@tanstack/react-query';
 
 export default function SignUpPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const router = useRouter();
+
+  const signup = async ({
+    name,
+    email,
+    password,
+  }: {
+    name: string;
+    email: string;
+    password: string;
+  }) => {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to sign up');
+    }
+    return data;
+  };
+
+  const mutation = useMutation({
+    mutationFn: signup,
+    onSuccess: () => {
+      router.push('/signin');
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    setIsLoading(true);
-
-    try {
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to sign up');
-      } else {
-        setSuccess('Account created! Redirecting to sign in...');
-        setTimeout(() => router.push('/auth/signin'), 1500);
-      }
-    } catch (_err) {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    mutation.mutate({ name, email, password });
   };
 
   return (
@@ -99,20 +103,19 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          {error && (
-            <div className='text-red-500 text-sm text-center'>{error}</div>
-          )}
-          {success && (
-            <div className='text-green-600 text-sm text-center'>{success}</div>
+          {mutation.isError && (
+            <div className='text-red-500 text-sm text-center'>
+              {(mutation.error as Error).message}
+            </div>
           )}
 
           <div>
             <button
               type='submit'
-              disabled={isLoading}
+              disabled={mutation.isPending}
               className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'
             >
-              {isLoading ? (
+              {mutation.isPending ? (
                 <span className='flex items-center'>
                   <svg
                     className='animate-spin -ml-1 mr-3 h-5 w-5 text-white'
@@ -147,7 +150,7 @@ export default function SignUpPage() {
           <p className='text-sm text-gray-600'>
             Already have an account?{' '}
             <Link
-              href='/auth/signin'
+              href='/signin'
               className='font-medium text-blue-600 hover:text-blue-500'
             >
               Sign in

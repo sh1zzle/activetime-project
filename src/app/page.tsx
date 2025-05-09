@@ -14,13 +14,13 @@ export default function Home() {
       </p>
       <div className='flex gap-4'>
         <Link
-          href='/auth/signin'
+          href='/signin'
           className='bg-blue-600 text-white px-4 py-2 rounded'
         >
           Sign In
         </Link>
         <Link
-          href='/auth/signup'
+          href='/signup'
           className='bg-gray-200 text-blue-600 px-4 py-2 rounded border border-blue-600'
         >
           Sign Up
