@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Connection } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IUser extends Document {
   name: string;
@@ -8,19 +8,7 @@ export interface IUser extends Document {
   updatedAt: Date;
 }
 
-// Create a specific connection to the activetime database
-let activeTimeDb: Connection;
-
-if (mongoose.connection.readyState === 0) {
-  activeTimeDb = mongoose.connection.useDb('activetime');
-} else {
-  // If mongoose is already connected, check if it's to the right database
-  if (mongoose.connection.db?.databaseName !== 'activetime') {
-    activeTimeDb = mongoose.connection.useDb('activetime');
-  } else {
-    activeTimeDb = mongoose.connection;
-  }
-}
+const activeTimeDb = mongoose.connection.useDb('activetime');
 
 const UserSchema: Schema = new Schema(
   {
