@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import Sleep from '@/models/Sleep';
-import { connectToDatabase } from '@/lib/mongodb';
+import { authOptions } from '../../../lib/auth';
+import Sleep from '../../../models/Sleep';
+import { connectToDatabase } from '../../../lib/mongodb';
 
 export async function POST(req: Request) {
   try {
