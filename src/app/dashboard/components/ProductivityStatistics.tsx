@@ -121,11 +121,17 @@ export default function ProductivityStatistics() {
       const secondHalf = entries.slice(0, halfPoint);
 
       const firstHalfAvg =
-        firstHalf.reduce((sum, entry) => sum + entry.productivityRating, 0) /
-        firstHalf.length;
+        firstHalf.reduce(
+          (sum: number, entry: ProductivityEntry) =>
+            sum + entry.productivityRating,
+          0
+        ) / (firstHalf.length || 1);
       const secondHalfAvg =
-        secondHalf.reduce((sum, entry) => sum + entry.productivityRating, 0) /
-        secondHalf.length;
+        secondHalf.reduce(
+          (sum: number, entry: ProductivityEntry) =>
+            sum + entry.productivityRating,
+          0
+        ) / (secondHalf.length || 1);
 
       let trend: 'improving' | 'declining' | 'stable' = 'stable';
       const difference = secondHalfAvg - firstHalfAvg;
@@ -281,8 +287,6 @@ export default function ProductivityStatistics() {
   }
 
   const productivityBadge = getRatingBadge(stats.averageProductivity);
-  const focusBadge = getRatingBadge(stats.averageFocus);
-  const energyBadge = getRatingBadge(stats.averageEnergy);
 
   return (
     <div className='space-y-6'>
