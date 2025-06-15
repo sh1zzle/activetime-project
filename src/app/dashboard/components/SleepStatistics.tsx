@@ -10,6 +10,10 @@ import {
   Clock,
   RefreshCw,
   Zap,
+  Target,
+  Brain,
+  Award,
+  AlertCircle,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +39,14 @@ interface SleepStats {
   bestQualitySleep: { quality: number; date: string };
   totalSleepTime: number;
   sleepEfficiency: number;
+  // Advanced Analysis
+  sleepTrend: 'improving' | 'declining' | 'stable';
+  qualityTrend: 'improving' | 'declining' | 'stable';
+  consistencyScore: number;
+  weeklyAverage: number;
+  sleepDebt: number;
+  insights: string[];
+  recommendations: string[];
 }
 
 export default function SleepStatistics() {
@@ -97,6 +109,146 @@ export default function SleepStatistics() {
       const averageQuality = totalQuality / totalEntries;
       const sleepEfficiency = Math.min((averageDuration / 8) * 100, 100); // Based on 8-hour ideal
 
+      // Advanced Analysis: Trend Calculation
+      const halfPoint = Math.floor(entries.length / 2);
+      const recentHalf = entries.slice(0, halfPoint);
+      const olderHalf = entries.slice(halfPoint);
+
+      const recentDurationAvg =
+        recentHalf.reduce((sum: number, entry: SleepEntry) => {
+          const duration =
+            entry.duration ||
+            (new Date(entry.endTime).getTime() -
+              new Date(entry.startTime).getTime()) /
+              (1000 * 60 * 60);
+          return sum + duration;
+        }, 0) / recentHalf.length;
+
+      const olderDurationAvg =
+        olderHalf.reduce((sum: number, entry: SleepEntry) => {
+          const duration =
+            entry.duration ||
+            (new Date(entry.endTime).getTime() -
+              new Date(entry.startTime).getTime()) /
+              (1000 * 60 * 60);
+          return sum + duration;
+        }, 0) / olderHalf.length;
+
+      const recentQualityAvg =
+        recentHalf.reduce(
+          (sum: number, entry: SleepEntry) => sum + entry.quality,
+          0
+        ) / recentHalf.length;
+      const olderQualityAvg =
+        olderHalf.reduce(
+          (sum: number, entry: SleepEntry) => sum + entry.quality,
+          0
+        ) / olderHalf.length;
+
+      const durationDiff = recentDurationAvg - olderDurationAvg;
+      const qualityDiff = recentQualityAvg - olderQualityAvg;
+
+      const sleepTrend =
+        durationDiff > 0.5
+          ? 'improving'
+          : durationDiff < -0.5
+          ? 'declining'
+          : 'stable';
+      const qualityTrend =
+        qualityDiff > 0.3
+          ? 'improving'
+          : qualityDiff < -0.3
+          ? 'declining'
+          : 'stable';
+
+      // Consistency Score (based on standard deviation)
+      const durations = entries.map(
+        (entry: SleepEntry) =>
+          entry.duration ||
+          (new Date(entry.endTime).getTime() -
+            new Date(entry.startTime).getTime()) /
+            (1000 * 60 * 60)
+      );
+      const variance =
+        durations.reduce(
+          (sum: number, duration: number) =>
+            sum + Math.pow(duration - averageDuration, 2),
+          0
+        ) / totalEntries;
+      const stdDev = Math.sqrt(variance);
+      const consistencyScore = Math.max(0, Math.min(100, 100 - stdDev * 10)); // 0-100 scale
+
+      // Weekly Average (last 7 entries)
+      const lastWeek = entries.slice(0, Math.min(7, entries.length));
+      const weeklyAverage =
+        lastWeek.reduce((sum: number, entry: SleepEntry) => {
+          const duration =
+            entry.duration ||
+            (new Date(entry.endTime).getTime() -
+              new Date(entry.startTime).getTime()) /
+              (1000 * 60 * 60);
+          return sum + duration;
+        }, 0) / lastWeek.length;
+
+      // Sleep Debt (difference from 8-hour target)
+      const sleepDebt = Math.max(0, 8 * totalEntries - totalDuration);
+
+      // Generate Insights
+      const insights = [];
+      if (averageDuration >= 8) {
+        insights.push("You're getting adequate sleep duration on average!");
+      } else if (averageDuration >= 7) {
+        insights.push(
+          'Your sleep duration is close to the recommended 8 hours.'
+        );
+      } else {
+        insights.push(
+          'Consider increasing your sleep duration for better health.'
+        );
+      }
+
+      if (averageQuality >= 4) {
+        insights.push('Your sleep quality is excellent - keep it up!');
+      } else if (averageQuality >= 3) {
+        insights.push(
+          'Your sleep quality is good but has room for improvement.'
+        );
+      } else {
+        insights.push('Focus on improving your sleep environment and habits.');
+      }
+
+      if (consistencyScore >= 80) {
+        insights.push('You have very consistent sleep patterns.');
+      } else if (consistencyScore >= 60) {
+        insights.push('Your sleep schedule is moderately consistent.');
+      } else {
+        insights.push('Try to maintain more regular sleep and wake times.');
+      }
+
+      // Generate Recommendations
+      const recommendations = [];
+      if (averageDuration < 7) {
+        recommendations.push('Aim for 7-9 hours of sleep per night');
+      }
+      if (averageQuality < 3.5) {
+        recommendations.push('Create a relaxing bedtime routine');
+        recommendations.push('Keep your bedroom cool, dark, and quiet');
+      }
+      if (consistencyScore < 70) {
+        recommendations.push(
+          'Try to go to bed and wake up at the same time daily'
+        );
+      }
+      if (sleepEfficiency < 80) {
+        recommendations.push('Limit screen time before bed');
+        recommendations.push('Consider avoiding caffeine 6 hours before sleep');
+      }
+      if (sleepTrend === 'declining') {
+        recommendations.push(
+          'Review recent changes in your routine that might affect sleep'
+        );
+      }
+
       setStats({
         totalEntries,
         averageDuration,
@@ -106,6 +258,13 @@ export default function SleepStatistics() {
         bestQualitySleep: { quality: bestQuality, date: bestQualityDate },
         totalSleepTime: totalDuration,
         sleepEfficiency,
+        sleepTrend,
+        qualityTrend,
+        consistencyScore,
+        weeklyAverage,
+        sleepDebt,
+        insights,
+        recommendations,
       });
     } catch (err) {
       console.error('Error fetching sleep statistics:', err);
@@ -163,6 +322,18 @@ export default function SleepStatistics() {
     if (efficiency >= 70) return 'text-blue-600';
     if (efficiency >= 50) return 'text-yellow-600';
     return 'text-red-600';
+  };
+
+  const getTrendColor = (trend: string) => {
+    if (trend === 'improving') return 'text-green-600';
+    if (trend === 'declining') return 'text-red-600';
+    return 'text-gray-600';
+  };
+
+  const getTrendIcon = (trend: string) => {
+    if (trend === 'improving') return '📈';
+    if (trend === 'declining') return '📉';
+    return '➡️';
   };
 
   if (isLoading) {
@@ -291,6 +462,127 @@ export default function SleepStatistics() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Advanced Sleep Analysis Row */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        {/* Sleep Trend Analysis */}
+        <Card className='bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200'>
+          <CardHeader>
+            <CardTitle className='flex items-center space-x-2 text-indigo-800'>
+              <TrendingUp className='h-5 w-5' />
+              <span>Trend Analysis</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
+              <div>
+                <div className='text-sm text-indigo-700 mb-2'>
+                  Duration Trend
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <span className='text-2xl'>
+                    {getTrendIcon(stats.sleepTrend)}
+                  </span>
+                  <span
+                    className={`text-lg font-semibold capitalize ${getTrendColor(
+                      stats.sleepTrend
+                    )}`}
+                  >
+                    {stats.sleepTrend}
+                  </span>
+                </div>
+                <div className='text-sm text-indigo-600'>
+                  Weekly Avg: {formatDuration(stats.weeklyAverage)}
+                </div>
+              </div>
+              <div>
+                <div className='text-sm text-indigo-700 mb-2'>
+                  Quality Trend
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <span className='text-2xl'>
+                    {getTrendIcon(stats.qualityTrend)}
+                  </span>
+                  <span
+                    className={`text-lg font-semibold capitalize ${getTrendColor(
+                      stats.qualityTrend
+                    )}`}
+                  >
+                    {stats.qualityTrend}
+                  </span>
+                </div>
+                <div className='text-sm text-indigo-600'>
+                  Consistency: {stats.consistencyScore.toFixed(0)}%
+                </div>
+              </div>
+              <div>
+                <div className='text-sm text-indigo-700 mb-2'>Sleep Debt</div>
+                <div className='text-2xl font-bold text-indigo-900'>
+                  {formatDuration(stats.sleepDebt)}
+                </div>
+                <div className='text-sm text-indigo-600'>
+                  Hours behind target
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sleep Insights */}
+        <Card className='bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200'>
+          <CardHeader>
+            <CardTitle className='flex items-center space-x-2 text-emerald-800'>
+              <Brain className='h-5 w-5' />
+              <span>Sleep Insights</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-3'>
+              {stats.insights.map((insight, index) => (
+                <div
+                  key={index}
+                  className='flex items-start space-x-3 p-3 bg-white rounded-lg border border-emerald-100'
+                >
+                  <div className='flex-shrink-0 w-2 h-2 bg-emerald-500 rounded-full mt-2'></div>
+                  <p className='text-sm text-emerald-900'>{insight}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sleep Recommendations */}
+        <Card className='bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200'>
+          <CardHeader>
+            <CardTitle className='flex items-center space-x-2 text-amber-800'>
+              <Target className='h-5 w-5' />
+              <span>Recommendations</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-3'>
+              {stats.recommendations.length > 0 ? (
+                stats.recommendations.map((recommendation, index) => (
+                  <div
+                    key={index}
+                    className='flex items-start space-x-3 p-3 bg-white rounded-lg border border-amber-100'
+                  >
+                    <AlertCircle className='flex-shrink-0 h-4 w-4 text-amber-600 mt-0.5' />
+                    <p className='text-sm text-amber-900'>{recommendation}</p>
+                  </div>
+                ))
+              ) : (
+                <div className='flex items-center space-x-3 p-3 bg-white rounded-lg border border-amber-100'>
+                  <Award className='flex-shrink-0 h-4 w-4 text-amber-600' />
+                  <p className='text-sm text-amber-900'>
+                    Great job! Your sleep habits are on track.
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Detailed Stats */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>

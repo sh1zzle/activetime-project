@@ -12,6 +12,7 @@ import {
   Sparkles,
   Activity,
   TrendingUp,
+  BarChart3,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ import SleepStatistics from './components/SleepStatistics';
 import ProductivityEntryForm from './components/ProductivityEntryForm';
 import ProductivityHistory from './components/ProductivityHistory';
 import ProductivityStatistics from './components/ProductivityStatistics';
+import CorrelationAnalysis from './components/CorrelationAnalysis';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -29,7 +31,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeTab, setActiveTab] = useState<'sleep' | 'productivity'>('sleep');
+  const [activeTab, setActiveTab] = useState<
+    'sleep' | 'productivity' | 'correlation'
+  >('sleep');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -156,7 +160,9 @@ export default function DashboardPage() {
             <span>
               {activeTab === 'sleep'
                 ? 'Sleep Insights'
-                : 'Productivity Insights'}
+                : activeTab === 'productivity'
+                ? 'Productivity Insights'
+                : 'Correlation Insights'}
             </span>
           </Badge>
         </div>
@@ -184,6 +190,17 @@ export default function DashboardPage() {
           >
             <TrendingUp className='h-4 w-4' />
             <span>Productivity Tracking</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('correlation')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'correlation'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <BarChart3 className='h-4 w-4' />
+            <span>Correlation Analysis</span>
           </button>
         </div>
 
@@ -216,6 +233,10 @@ export default function DashboardPage() {
               />
             </div>
           </div>
+        )}
+
+        {activeTab === 'correlation' && (
+          <CorrelationAnalysis key={`correlation-${refreshTrigger}`} />
         )}
       </div>
     </div>
