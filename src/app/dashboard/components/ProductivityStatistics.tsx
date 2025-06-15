@@ -160,7 +160,7 @@ export default function ProductivityStatistics() {
       });
     } catch (err) {
       console.error('Error fetching productivity statistics:', err);
-      setError('Failed to load productivity statistics. Please try again.');
+      setError('Failed to load productivity statistics. Please try again..');
     } finally {
       setIsLoading(false);
     }
