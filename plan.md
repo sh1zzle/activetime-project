@@ -50,11 +50,11 @@ src/
   - [x] Create sleep history view
   - [x] Add sleep statistics
 
-- [ ] Productivity Tracking
-  - [ ] Create productivity rating system
-  - [ ] Implement productivity input form
-  - [ ] Add productivity history view
-  - [ ] Create productivity metrics
+- [x] Productivity Tracking
+  - [x] Create productivity rating system
+  - [x] Implement productivity input form
+  - [x] Add productivity history view
+  - [x] Create productivity metrics
 
 ### Phase 3: Data Analysis and Visualization
 

@@ -4,13 +4,24 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Moon, Sun, User, LogOut, Sparkles, Activity } from 'lucide-react';
+import {
+  Moon,
+  Sun,
+  User,
+  LogOut,
+  Sparkles,
+  Activity,
+  TrendingUp,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import SleepEntryForm from './components/SleepEntryForm';
 import SleepHistory from './components/SleepHistory';
 import SleepStatistics from './components/SleepStatistics';
+import ProductivityEntryForm from './components/ProductivityEntryForm';
+import ProductivityHistory from './components/ProductivityHistory';
+import ProductivityStatistics from './components/ProductivityStatistics';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -18,6 +29,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeTab, setActiveTab] = useState<'sleep' | 'productivity'>('sleep');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -36,6 +48,10 @@ export default function DashboardPage() {
   }, []);
 
   const handleSleepEntrySuccess = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  const handleProductivityEntrySuccess = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
@@ -78,10 +94,10 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h1 className='text-2xl font-bold text-gray-900'>
-                  Sleep Tracker
+                  ActiveTime Tracker
                 </h1>
                 <p className='text-sm text-gray-500'>
-                  Track your rest, improve your health
+                  Track your sleep and productivity
                 </p>
               </div>
             </div>
@@ -132,25 +148,75 @@ export default function DashboardPage() {
               👋
             </h2>
             <p className='text-gray-600'>
-              Ready to track your sleep and improve your well-being?
+              Ready to track your sleep and productivity?
             </p>
           </div>
           <Badge variant='outline' className='flex items-center space-x-1'>
             <Sparkles className='h-3 w-3' />
-            <span>Sleep Insights</span>
+            <span>
+              {activeTab === 'sleep'
+                ? 'Sleep Insights'
+                : 'Productivity Insights'}
+            </span>
           </Badge>
         </div>
 
-        {/* Main Content Grid */}
-        <div className='grid grid-cols-1 xl:grid-cols-12 gap-8'>
-          <div className='xl:col-span-8'>
-            <SleepStatistics key={`stats-${refreshTrigger}`} />
-          </div>
-          <div className='flex flex-row gap-4'>
-            <SleepEntryForm onSuccess={handleSleepEntrySuccess} />
-            <SleepHistory key={`history-${refreshTrigger}`} />
-          </div>
+        {/* Tabs */}
+        <div className='flex space-x-1 mb-8 p-1 bg-gray-100 rounded-lg w-fit'>
+          <button
+            onClick={() => setActiveTab('sleep')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'sleep'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Moon className='h-4 w-4' />
+            <span>Sleep Tracking</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('productivity')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'productivity'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <TrendingUp className='h-4 w-4' />
+            <span>Productivity Tracking</span>
+          </button>
         </div>
+
+        {/* Content Based on Active Tab */}
+        {activeTab === 'sleep' && (
+          <div className='grid grid-cols-1 xl:grid-cols-12 gap-8'>
+            <div className='xl:col-span-8'>
+              <SleepStatistics key={`stats-${refreshTrigger}`} />
+            </div>
+            <div className='flex flex-row gap-4'>
+              <SleepEntryForm onSuccess={handleSleepEntrySuccess} />
+              <SleepHistory key={`history-${refreshTrigger}`} />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'productivity' && (
+          <div className='grid grid-cols-1 xl:grid-cols-12 gap-8'>
+            <div className='xl:col-span-8'>
+              <ProductivityStatistics
+                key={`productivity-stats-${refreshTrigger}`}
+              />
+            </div>
+            <div className='flex flex-row gap-4'>
+              <ProductivityEntryForm
+                onSuccess={handleProductivityEntrySuccess}
+              />
+              <ProductivityHistory
+                key={`productivity-history-${refreshTrigger}`}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

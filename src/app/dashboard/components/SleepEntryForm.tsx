@@ -53,7 +53,8 @@ export default function SleepEntryForm({ onSuccess }: SleepEntryFormProps) {
     }
 
     // Check if sleep duration is reasonable (between 1 hour and 16 hours)
-    const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+    const durationHours =
+      (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
     if (durationHours < 1) {
       setError('Sleep duration must be at least 1 hour');
       setIsLoading(false);
@@ -103,89 +104,90 @@ export default function SleepEntryForm({ onSuccess }: SleepEntryFormProps) {
   const getQualityLabel = (value: number) => {
     const labels = {
       1: 'Poor',
-      2: 'Fair', 
+      2: 'Fair',
       3: 'Good',
       4: 'Very Good',
-      5: 'Excellent'
+      5: 'Excellent',
     };
     return labels[value as keyof typeof labels];
   };
 
   return (
     <div className='bg-white p-6 rounded-lg shadow-md'>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Bed className="h-5 w-5 text-blue-600" />
+      <div className='flex items-center justify-between mb-4'>
+        <div className='flex items-center space-x-2'>
+          <Bed className='h-5 w-5 text-blue-600' />
           <h2 className='text-xl font-semibold'>Sleep Tracker</h2>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="flex items-center space-x-2">
-              <Plus className="h-4 w-4" />
-              <span>Log Sleep</span>
+            <Button className='flex items-center'>
+              <Plus className='h-4 w-4' />
+              Log Sleep
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className='sm:max-w-[500px]'>
             <DialogHeader>
-              <DialogTitle className="flex items-center space-x-2">
-                <Bed className="h-5 w-5 text-blue-600" />
+              <DialogTitle className='flex items-center space-x-2'>
+                <Bed className='h-5 w-5 text-blue-600' />
                 <span>Record Sleep Entry</span>
               </DialogTitle>
               <DialogDescription>
-                Track your sleep patterns to analyze your rest quality and duration.
+                Track your sleep patterns to analyze your rest quality and
+                duration.
               </DialogDescription>
             </DialogHeader>
-            
+
             <form onSubmit={handleSubmit} className='space-y-6'>
               {success && (
                 <div className='flex items-center space-x-2 p-3 bg-green-50 text-green-700 rounded-md border border-green-200'>
-                  <CheckCircle className="h-4 w-4" />
+                  <CheckCircle className='h-4 w-4' />
                   <span>Sleep entry saved successfully!</span>
                 </div>
               )}
 
               {error && (
                 <div className='flex items-center space-x-2 p-3 bg-red-50 text-red-700 rounded-md border border-red-200'>
-                  <AlertCircle className="h-4 w-4" />
+                  <AlertCircle className='h-4 w-4' />
                   <span>{error}</span>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startTime">Sleep Start Time</Label>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='startTime'>Sleep Start Time</Label>
                   <DateTimePicker
                     value={startTime}
                     onChange={setStartTime}
-                    placeholder="When did you go to sleep?"
+                    placeholder='Start Time'
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="endTime">Sleep End Time</Label>
+                <div className='space-y-2'>
+                  <Label htmlFor='endTime'>Sleep End Time</Label>
                   <DateTimePicker
                     value={endTime}
                     onChange={setEndTime}
-                    placeholder="When did you wake up?"
+                    placeholder='End Time'
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="quality">
+              <div className='space-y-2'>
+                <Label htmlFor='quality'>
                   Sleep Quality: {getQualityLabel(quality)} ({quality}/5)
                 </Label>
-                <div className="px-3">
+                <div className='px-3'>
                   <input
-                    type="range"
-                    id="quality"
-                    min="1"
-                    max="5"
+                    type='range'
+                    id='quality'
+                    min='1'
+                    max='5'
                     value={quality}
                     onChange={(e) => setQuality(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    className='w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider'
                   />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <div className='flex justify-between text-xs text-gray-500 mt-1'>
                     <span>Poor</span>
                     <span>Fair</span>
                     <span>Good</span>
@@ -195,31 +197,31 @@ export default function SleepEntryForm({ onSuccess }: SleepEntryFormProps) {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="notes">Notes (optional)</Label>
+              <div className='space-y-2'>
+                <Label htmlFor='notes'>Notes (optional)</Label>
                 <textarea
-                  id="notes"
+                  id='notes'
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  placeholder="How was your sleep? Any factors that affected it?"
+                  className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none'
+                  placeholder='How was your sleep? Any factors that affected it?'
                 />
               </div>
 
               <DialogFooter>
                 <Button
-                  type="button"
-                  variant="outline"
+                  type='button'
+                  variant='outline'
                   onClick={() => setIsDialogOpen(false)}
                   disabled={isLoading}
                 >
                   Cancel
                 </Button>
                 <Button
-                  type="submit"
+                  type='submit'
                   disabled={isLoading}
-                  className="min-w-[100px]"
+                  className='min-w-[100px]'
                 >
                   {isLoading ? 'Saving...' : 'Save Entry'}
                 </Button>
@@ -230,20 +232,28 @@ export default function SleepEntryForm({ onSuccess }: SleepEntryFormProps) {
       </div>
 
       {/* Sleep Summary Card */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="text-sm text-gray-600 mb-2">Quick Stats</div>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+      <div className='bg-gray-50 rounded-lg p-4'>
+        <div className='text-sm text-gray-600 mb-2'>Quick Stats</div>
+        <div className='grid grid-cols-2 gap-4 text-sm'>
           <div>
-            <div className="font-medium text-gray-900">Last Entry</div>
-            <div className="text-gray-500">
-              {startTime && endTime ? format(endTime, 'MMM d, HH:mm') : 'No recent entry'}
+            <div className='font-medium text-gray-900'>Last Entry</div>
+            <div className='text-gray-500'>
+              {startTime && endTime
+                ? format(endTime, 'MMM d, HH:mm')
+                : 'No recent entry'}
             </div>
           </div>
           <div>
-            <div className="font-medium text-gray-900">Duration</div>
-            <div className="text-gray-500">
-              {startTime && endTime ? 
-                `${Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60) * 10) / 10}h` 
+            <div className='font-medium text-gray-900'>Duration</div>
+            <div className='text-gray-500'>
+              {startTime && endTime
+                ? `${
+                    Math.round(
+                      ((endTime.getTime() - startTime.getTime()) /
+                        (1000 * 60 * 60)) *
+                        10
+                    ) / 10
+                  }h`
                 : '-- hours'}
             </div>
           </div>
