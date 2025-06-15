@@ -20,7 +20,6 @@ A web application to track sleep patterns and analyze their impact on productivi
 src/
 ├── app/                    # Next.js app directory
 │   ├── api/               # API routes
-│   ├── auth/              # Authentication pages
 │   ├── dashboard/         # Dashboard pages
 │   └── components/        # Shared components
 ├── lib/                   # Utility functions
@@ -37,18 +36,19 @@ src/
 - [x] Set up MongoDB connection
 - [x] Configure NextAuth.js
 - [x] Create User model
-- [x] Implement sign-in/sign-up pages
+- [x] Implement sign-in/sign-up pages (now at /signin and /signup)
 - [x] Set up protected routes
 
 ### Phase 2: Core Features
 
-- [ ] Sleep Tracking
+- [x] Sleep Tracking (backend)
+  - [x] Create Sleep model
+  - [x] Add sleep entry API endpoint
+- [x] Sleep Tracking (frontend)
 
-  - [ ] Create Sleep model
-  - [ ] Implement sleep entry form
-  - [ ] Add sleep entry API endpoint
-  - [ ] Create sleep history view
-  - [ ] Add sleep statistics
+  - [x] Implement sleep entry form
+  - [x] Create sleep history view
+  - [x] Add sleep statistics
 
 - [ ] Productivity Tracking
   - [ ] Create productivity rating system
@@ -112,14 +112,14 @@ src/
   - [ ] End-to-end tests
 
 - [ ] Deployment
-  - [ ] Set up Vercel deployment
+  - [ ] Set up Vercel deployment (instructions ready, not yet confirmed deployed)
   - [ ] Configure environment variables
   - [ ] Set up CI/CD pipeline
 
 ## Current Status
 
 - Phase 1: Completed ✅
-- Phase 2: In Progress 🚧
+- Phase 2: Sleep tracking completed ✅, Productivity tracking not started ⏳
 - Phase 3: Not Started ⏳
 - Phase 4: Not Started ⏳
 - Phase 5: Not Started ⏳
@@ -127,10 +127,10 @@ src/
 
 ## Next Steps
 
-1. Implement sleep tracking functionality
-2. Create sleep entry form
-3. Add sleep history view
-4. Implement basic data visualization
+1. Implement productivity tracking features
+2. Begin data analysis and visualization
+3. Enhance UI/UX with additional features
+4. Prepare for deployment
 
 ## Notes
 
