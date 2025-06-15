@@ -49,7 +49,7 @@ export default function ImportHealthData() {
           <ol className='list-decimal ml-5 text-sm text-gray-700'>
             <li>Open the Health app on your iPhone</li>
             <li>Tap your profile picture in the top right</li>
-            <li>Scroll down and tap "Export All Health Data"</li>
+            <li>Scroll down and tap &quot;Export All Health Data&quot;</li>
             <li>Wait for the export to complete and save the file</li>
             <li>Upload the export.zip file below</li>
           </ol>
@@ -62,12 +62,7 @@ export default function ImportHealthData() {
               type='file'
               accept='.zip'
               onChange={handleFileUpload}
-              className='mt-1 block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100'
+              className='mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
             />
           </label>
         </div>
